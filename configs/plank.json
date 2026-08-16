@@ -1,0 +1,149 @@
+{
+    "exercise": {
+        "id": "plank",
+        "name": "Plank",
+        "family": "isometric_core",
+        "category": "isometric",
+        "difficulty": "beginner",
+        "muscles": [
+            "core",
+            "transverse_abdominis",
+            "shoulders"
+        ]
+    },
+
+    "input": {
+        "camera_views": [
+            "side"
+        ],
+        "max_people": 1,
+        "min_fps": 30,
+        "min_resolution": [
+            720,
+            1280
+        ]
+    },
+
+    "landmarks": {
+        "model": "mediapipe_blazepose",
+
+        "selected_landmarks": [
+            "LEFT_SHOULDER",
+            "RIGHT_SHOULDER",
+            "LEFT_ELBOW",
+            "RIGHT_ELBOW",
+            "LEFT_HIP",
+            "RIGHT_HIP",
+            "LEFT_ANKLE",
+            "RIGHT_ANKLE"
+        ],
+
+        "tracking_landmarks": [
+            "LEFT_SHOULDER",
+            "LEFT_HIP",
+            "LEFT_ANKLE"
+        ],
+
+        "angle_definitions": {
+            "body_alignment": [
+                "LEFT_SHOULDER",
+                "LEFT_HIP",
+                "LEFT_ANKLE"
+            ]
+        },
+
+        "symmetry_pairs": [
+            [
+                "LEFT_SHOULDER",
+                "RIGHT_SHOULDER"
+            ],
+            [
+                "LEFT_HIP",
+                "RIGHT_HIP"
+            ]
+        ]
+    },
+
+    "movement": {
+        "movement_type": "Isometric",
+        "movement_plane": "Sagittal",
+        "movement_direction": "Static",
+
+        "primary_joint": "core",
+
+        "secondary_joints": [
+            "shoulder"
+        ],
+
+        "phases": [
+            "holding",
+            "resting"
+        ]
+    },
+
+    "features": {
+        "joint_angles": true,
+        "velocity": false,
+        "acceleration": false,
+        "angular_velocity": false,
+        "angular_acceleration": false,
+        "rom": false,
+        "stability": true,
+        "symmetry": false,
+        "trajectory": false
+    },
+
+    "labels": {
+        "valid_phases": ["REST", "SETUP", "HOLD", "FINISH"],
+        "valid_errors": ["hips_too_high", "hips_sagging", "head_drooping"],
+        "possible_errors": [
+            "hips_too_high",
+            "hips_sagging",
+            "head_drooping"
+        ],
+
+        "phase_classes": [
+            "holding",
+            "resting"
+        ],
+
+        "pass_fail_classes": [
+            "pass",
+            "fail"
+        ]
+    },
+
+    "reference": {
+        "expected_rom": {},
+        "phase_reference": {
+            "min_hold_duration": 30.0
+        }
+    },
+
+    "runtime": {
+        "supported_variation": "marching_plank",
+        "repetition_definition": "official result is the number of completed seconds of valid, stable Marching Plank support; movement states remain visible but do not increment time",
+        "validation_status": "unvalidated_no_marching_plank_development_video",
+        "repetition_counter": {
+            "min_landmark_confidence": 0.55,
+            "signal_smoothing_window": 5,
+            "neutral_baseline_window": 15,
+            "lift_start_displacement": 0.025,
+            "leg_up_displacement": 0.06,
+            "return_tolerance": 0.025,
+            "return_hysteresis": 0.015,
+            "maximum_other_leg_displacement": 0.035,
+            "maximum_pelvis_motion": 0.055,
+            "minimum_repetition_duration": 0.35,
+            "maximum_repetition_duration": 8.0,
+            "cooldown_seconds": 0.25,
+            "max_low_confidence_gap_frames": 4,
+            "hold_unit_seconds": 1.0
+        }
+    },
+    "metadata": {
+        "schema_version": "2.0.0",
+        "author": "AI Engine Team",
+        "last_updated": "2026-07-29"
+    }
+}

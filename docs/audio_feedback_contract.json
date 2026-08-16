@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "contract_name": "AI Engine Audio Feedback Event Contract",
+  "contract_version": "1.0.0",
+  "transport_independent": true,
+  "event_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "event_id",
+      "event_type",
+      "session_id",
+      "exercise_id",
+      "family_id",
+      "unit_index",
+      "timestamp_seconds"
+    ],
+    "properties": {
+      "event_id": {"type": "string", "minLength": 1},
+      "event_type": {"enum": ["first_repetition_completed"]},
+      "session_id": {"type": "string", "minLength": 1},
+      "exercise_id": {"type": "string", "minLength": 1},
+      "family_id": {"type": "string", "minLength": 1},
+      "unit_index": {"type": "integer", "minimum": 1},
+      "timestamp_seconds": {"type": "number", "minimum": 0},
+      "language": {"type": ["string", "null"], "enum": ["ar", "en", null]},
+      "metadata": {"type": "object"}
+    }
+  },
+  "example": {
+    "event_id": "session-123:first_repetition_completed:1",
+    "event_type": "first_repetition_completed",
+    "session_id": "session-123",
+    "exercise_id": "squat",
+    "family_id": "squat",
+    "unit_index": 1,
+    "timestamp_seconds": 4.2,
+    "language": "ar",
+    "metadata": {}
+  },
+  "resolved_feedback": {
+    "ar": "أحسنت",
+    "en": "Great job!"
+  },
+  "initialization": {
+    "python": "AudioFeedbackService.from_default_config()",
+    "configuration": "configs/audio_feedback.json",
+    "language_override_environment_variable": "AI_ENGINE_AUDIO_LANGUAGE"
+  },
+  "delivery": {
+    "asynchronous": true,
+    "queue_capacity": 1,
+    "duplicate_policy": "event_id is accepted at most once per service/session",
+    "cooldown_policy": "event type cooldown from config; busy utterances are dropped rather than backlogged"
+  },
+  "tts_tiers": [
+    {"tier": 1, "name": "neural_or_cache", "arabic_voice": "ar-SA-HamedNeural", "english_voice": "en-US-AriaNeural"},
+    {"tier": 2, "name": "windows_sapi", "protocol": "language|text over persistent PowerShell stdin"},
+    {"tier": 3, "name": "beep", "implementation": "winsound.Beep"}
+  ],
+  "cache": {
+    "default_directory": "%TEMP%/ai_fitness_tts_cache",
+    "key": "SHA1(neural_voice + '|' + normalized_text), first 20 hex characters",
+    "prewarm": "background daemon threads; live speech has priority"
+  },
+  "lifecycle": {
+    "start": "create one service for one analysis worker/session",
+    "stop_back_new_session_close": "call shutdown(); worker finally block guarantees cleanup",
+    "failure": "audio is fail-open and never mutates counting, AI output, or UI state"
+  },
+  "extension_rule": "Add a semantic event type and both ar/en phrases; do not emit detailed exercise errors without validated labels."
+}

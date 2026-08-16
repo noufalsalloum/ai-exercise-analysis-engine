@@ -1,0 +1,169 @@
+{
+    "exercise": {
+        "id": "squat",
+        "name": "Squat",
+        "family": "bilateral_lower_body",
+        "category": "strength",
+        "difficulty": "beginner",
+        "muscles": [
+            "quadriceps",
+            "glutes",
+            "hamstrings",
+            "core"
+        ]
+    },
+
+    "input": {
+        "camera_views": [
+            "side",
+            "diagonal"
+        ],
+        "max_people": 1,
+        "min_fps": 30,
+        "min_resolution": [
+            720,
+            1280
+        ]
+    },
+
+    "landmarks": {
+        "model": "mediapipe_blazepose",
+
+        "selected_landmarks": [
+            "LEFT_SHOULDER",
+            "RIGHT_SHOULDER",
+            "LEFT_HIP",
+            "RIGHT_HIP",
+            "LEFT_KNEE",
+            "RIGHT_KNEE",
+            "LEFT_ANKLE",
+            "RIGHT_ANKLE"
+        ],
+
+        "tracking_landmarks": [
+            "LEFT_HIP",
+            "LEFT_KNEE",
+            "LEFT_ANKLE"
+        ],
+
+        "angle_definitions": {
+            "knee_angle": [
+                "LEFT_HIP",
+                "LEFT_KNEE",
+                "LEFT_ANKLE"
+            ],
+            "hip_angle": [
+                "LEFT_SHOULDER",
+                "LEFT_HIP",
+                "LEFT_KNEE"
+            ]
+        },
+
+        "symmetry_pairs": [
+            [
+                "LEFT_KNEE",
+                "RIGHT_KNEE"
+            ],
+            [
+                "LEFT_ANKLE",
+                "RIGHT_ANKLE"
+            ]
+        ]
+    },
+
+    "movement": {
+        "movement_type": "Dynamic",
+        "movement_plane": "Sagittal",
+        "movement_direction": "Vertical",
+
+        "primary_joint": "knee",
+
+        "secondary_joints": [
+            "hip",
+            "ankle"
+        ],
+
+        "phases": [
+            "standing",
+            "descending",
+            "bottom",
+            "ascending"
+        ]
+    },
+
+    "features": {
+        "joint_angles": true,
+        "velocity": true,
+        "acceleration": false,
+        "angular_velocity": true,
+        "angular_acceleration": false,
+        "rom": true,
+        "stability": true,
+        "symmetry": false,
+        "trajectory": true
+    },
+
+    "labels": {
+        "valid_phases": ["REST", "DESCENDING", "BOTTOM", "ASCENDING"],
+        "valid_errors": ["insufficient_depth", "knee_valgus", "excessive_forward_lean"],
+        "possible_errors": [
+            "insufficient_depth",
+            "knee_valgus",
+            "excessive_forward_lean"
+        ],
+
+        "phase_classes": [
+            "standing",
+            "descending",
+            "bottom",
+            "ascending"
+        ],
+
+        "pass_fail_classes": [
+            "pass",
+            "fail"
+        ]
+    },
+
+    "reference": {
+        "expected_rom": {
+            "knee_angle": [70.0, 175.0]
+        },
+        "phase_reference": {
+            "bottom_threshold_velocity": 0.05
+        }
+    },
+
+    "runtime": {
+        "supported_variation": "air_squat",
+        "repetition_definition": "standing -> descending -> bottom -> ascending -> standing",
+        "repetition_counter": {
+            "min_landmark_confidence": 0.55,
+            "angle_smoothing_window": 5,
+            "pelvis_smoothing_window": 5,
+            "side_confidence_window": 12,
+            "side_switch_margin": 0.15,
+            "side_switch_confirm_frames": 5,
+            "standing_ready_angle": 155.0,
+            "descent_enter_angle": 145.0,
+            "bottom_enter_angle": 110.0,
+            "bottom_exit_angle": 122.0,
+            "standing_return_angle": 155.0,
+            "descent_start_displacement": 0.015,
+            "minimum_pelvis_displacement": 0.07,
+            "return_pelvis_tolerance": 0.055,
+            "ascent_displacement_hysteresis": 0.015,
+            "minimum_knee_rom": 45.0,
+            "minimum_hip_rom": 25.0,
+            "minimum_repetition_duration": 0.45,
+            "maximum_repetition_duration": 8.0,
+            "cooldown_seconds": 0.25,
+            "max_low_confidence_gap_frames": 4
+        }
+    },
+    "metadata": {
+        "schema_version": "2.0.0",
+        "author": "AI Engine Team",
+        "last_updated": "2026-07-29"
+    }
+}

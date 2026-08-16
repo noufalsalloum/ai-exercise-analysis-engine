@@ -1,0 +1,27 @@
+{
+  "split": "validation",
+  "subjects": [
+    "9"
+  ],
+  "seed": 42,
+  "method": "exhaustive_metadata_balance_over_9_subjects",
+  "statistics": {
+    "subjects": [
+      "9"
+    ],
+    "repetitions": 23,
+    "correct": 18,
+    "incorrect": 5,
+    "correct_percent": 78.26086956521739,
+    "camera_samples": 46,
+    "camera_distribution": {
+      "Camera17": 23,
+      "Camera18": 23
+    },
+    "orientation_distribution": {
+      "front": 11,
+      "half-profile": 12
+    }
+  },
+  "assignment_sha256": "342d5a3646f9dd4c162c357a966405e82ec2cdb7937dbd731a52362a8ef73cd4"
+}

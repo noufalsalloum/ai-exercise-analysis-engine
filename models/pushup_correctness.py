@@ -1,0 +1,77 @@
+"""Frozen-MotionBERT correctness model scoped to table/incline Push-ups."""
+
+from __future__ import annotations
+
+from pathlib import Path
+from typing import Optional
+
+import torch
+import torch.nn as nn
+
+from backbone.motionbert import MotionBERT
+from experts.pushup_expert import PushupExpert
+
+
+class PushupCorrectnessHead(nn.Module):
+    def __init__(self, dropout: float = 0.25) -> None:
+        super().__init__()
+        self.network = nn.Sequential(
+            nn.LayerNorm(1024), nn.Linear(1024, 512), nn.GELU(), nn.Dropout(dropout),
+            nn.Linear(512, 128), nn.GELU(), nn.Dropout(dropout), nn.Linear(128, 2),
+        )
+
+    def forward(self, embedding: torch.Tensor) -> torch.Tensor:
+        if embedding.ndim != 2 or embedding.shape[-1] != 1024:
+            raise ValueError(f"Expected (B,1024), got {tuple(embedding.shape)}")
+        return self.network(embedding)
+
+
+class PushupCorrectnessModel(nn.Module):
+    """Frozen shared backbone with an independent PushupExpert and head."""
+
+    def __init__(
+        self,
+        motionbert_checkpoint: str | Path | None = None,
+        *,
+        backbone: Optional[nn.Module] = None,
+        dropout: float = 0.25,
+    ) -> None:
+        super().__init__()
+        self.backbone = backbone or MotionBERT(checkpoint_path=motionbert_checkpoint)
+        self.expert = PushupExpert(dropout=dropout)
+        self.correctness_head = PushupCorrectnessHead(dropout=dropout)
+        self.set_backbone_frozen(True)
+
+    def set_backbone_frozen(self, frozen: bool = True) -> None:
+        self.backbone_frozen = bool(frozen)
+        for parameter in self.backbone.parameters():
+            parameter.requires_grad_(not frozen)
+        if frozen:
+            self.backbone.eval()
+
+    def train(self, mode: bool = True) -> "PushupCorrectnessModel":
+        super().train(mode)
+        if self.backbone_frozen:
+            self.backbone.eval()
+        return self
+
+    def forward(self, values: torch.Tensor, temporal_mask: torch.Tensor | None = None) -> dict[str, torch.Tensor]:
+        if values.ndim != 4 or values.shape[2:] != (17, 3):
+            raise ValueError(f"Expected MotionBERT input (B,T,17,3), got {tuple(values.shape)}")
+        with torch.no_grad() if self.backbone_frozen else torch.enable_grad():
+            features = self.backbone(values)
+        return self.forward_features(features, temporal_mask)
+
+    def forward_features(self, features: torch.Tensor, temporal_mask: torch.Tensor | None = None) -> dict[str, torch.Tensor]:
+        if features.ndim != 4 or features.shape[2:] != (17, 512):
+            raise ValueError(f"Expected frozen features (B,T,17,512), got {tuple(features.shape)}")
+        expert = self.expert(features, temporal_mask=temporal_mask)
+        embedding = expert["global_embedding"]
+        if embedding is None:
+            raise RuntimeError("PushupExpert did not return a global embedding.")
+        logits = self.correctness_head(embedding)
+        return {
+            "logits": logits,
+            "correct_probability": torch.softmax(logits, dim=-1)[:, 1],
+            "global_embedding": embedding,
+        }

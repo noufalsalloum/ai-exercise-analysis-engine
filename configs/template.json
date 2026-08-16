@@ -1,0 +1,95 @@
+{
+    "exercise": {
+        "id": "Unique exercise family identifier",
+        "name": "Exercise family name",
+        "family": "Exercise family category",
+        "category": "Exercise type (strength, cardio, mobility, etc.)",
+        "difficulty": "Difficulty level (beginner, intermediate, advanced)",
+        "muscles": [
+        "Primary and secondary muscles involved"
+        ]
+    },
+    "input": {
+        "camera_views": [
+        "Supported camera views (e.g., side, front, diagonal)"
+        ],
+        "max_people": "Maximum number of people allowed in frame",
+        "min_fps": "Minimum required frames per second",
+        "min_resolution": [
+        "Minimum height resolution",
+        "Minimum width resolution"
+        ]
+    },
+    "landmarks": {
+        "model": "Pose estimation model name",
+        "selected_landmarks": [
+        "List of landmarks extracted and used in analysis"
+        ],
+        "tracking_landmarks": [
+        "Main keypoints tracked for primary movement analysis"
+        ],
+        "angle_definitions": {
+        "angle_name": [
+            "First point landmark",
+            "Vertex (center) landmark",
+            "Third point landmark"
+        ]
+        },
+        "symmetry_pairs": [
+        [
+            "Left side landmark",
+            "Corresponding right side landmark"
+        ]
+        ]
+    },
+    "movement": {
+        "movement_type": "Movement classification (Dynamic / Isometric / Static)",
+        "movement_plane": "Anatomical plane of movement (Sagittal / Frontal / Transverse)",
+        "movement_direction": "Primary direction of motion (Vertical, Horizontal, etc.)",
+        "primary_joint": "Primary joint driving the movement",
+        "secondary_joints": [
+        "Secondary or supporting joints involved"
+        ],
+        "phases": [
+        "Chronological sequence of movement phases"
+        ]
+    },
+    "features": {
+        "joint_angles": "Whether joint angle calculation is required (true/false)",
+        "velocity": "Whether linear velocity calculation is required (true/false)",
+        "acceleration": "Whether linear acceleration calculation is required (true/false)",
+        "angular_velocity": "Whether angular velocity calculation is required (true/false)",
+        "angular_acceleration": "Whether angular acceleration calculation is required (true/false)",
+        "rom": "Whether Range of Motion analysis is required (true/false)",
+        "stability": "Whether center of mass or body stability analysis is required (true/false)",
+        "symmetry": "Whether body symmetry comparison is required (true/false)",
+        "trajectory": "Whether spatial movement trajectory tracking is required (true/false)"
+    },
+    "labels": {
+        "possible_errors": [
+        "List of all detectable form and technique errors"
+        ],
+        "phase_classes": [
+        "List of target phase classification labels"
+        ],
+        "pass_fail_classes": [
+        "Overall evaluation output classes (e.g., pass, fail)"
+        ]
+    },
+    "reference": {
+        "expected_rom": {
+        "angle_name": [
+            "Minimum expected angle boundary",
+            "Maximum expected angle boundary"
+        ]
+        },
+        "phase_reference": {
+        "phase_metric_name": "Threshold value used to trigger phase transition"
+        }
+    },
+    "metadata": {
+        "schema_version": "Configuration schema version",
+        "author": "Author or team name",
+        "last_updated": "Date of last update (YYYY-MM-DD)"
+    }
+}

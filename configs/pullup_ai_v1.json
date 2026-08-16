@@ -1,0 +1,8 @@
+{
+  "status": "Engineering MVP / Learned Assessment Unavailable",
+  "scope": "standard Pull-up rule-based runtime",
+  "learned_boundary": null,
+  "learned_correctness": null,
+  "detailed_error_model": null,
+  "reason": "No local repetition-boundary or correctness ground truth"
+}

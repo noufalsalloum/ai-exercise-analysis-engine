@@ -1,0 +1,15 @@
+{
+  "enabled": true,
+  "device": "auto",
+  "boundary_checkpoint": "checkpoints/squat_ai_v2/rep_boundary/best.pt",
+  "correctness_checkpoint": "checkpoints/squat_ai_v3/correctness/final_dev.pt",
+  "error_checkpoint": "checkpoints/squat_error_v1/best.pt",
+  "motionbert_checkpoint": "models/latest_epoch.bin",
+  "correctness_threshold": 0.61,
+  "minimum_frames": 38,
+  "completion_lag_frames": 8,
+  "live_poll_interval_frames": 90,
+  "representative_radius": 2,
+  "minimum_representative_confidence": 0.2,
+  "output_dir": "results/squat_sessions"
+}

@@ -1,0 +1,55 @@
+{
+  "schema_version": "squat_ai_robustness_v1",
+  "active_correctness_model": "V3 Development Final",
+  "calibration": {
+    "enabled": true,
+    "method": "platt",
+    "coefficient": 0.38277181529247245,
+    "intercept": 0.7114508844158456,
+    "raw_threshold": 0.61,
+    "calibrated_threshold": 0.7073750795830384,
+    "source": "310 Development LOSO OOF predictions; subjects 1,2,3,5,6,8,9",
+    "historical_test_subjects_used": false
+  },
+  "abstention": {
+    "margin_enabled": false,
+    "derived_margin": 0.06422608635534222,
+    "margin_reason": "Cross-fitted selective metrics did not improve safely",
+    "supported_camera_views": [
+      "front",
+      "half-profile"
+    ],
+    "unsupported_view_result": "NEEDS_REVIEW",
+    "unsupported_view_reason": "Correctness V3 was not developed or validated on full side-view user video"
+  },
+  "detailed_error": {
+    "supported_camera_views": [
+      "front",
+      "half-profile"
+    ],
+    "minimum_confidence": 0.9952971935272217,
+    "confidence_source": "5th percentile among correctly classified Development-validation images",
+    "unsupported_or_low_confidence_result": "form_issue"
+  },
+  "performance_score": {
+    "minimum_assessed_reps": 3,
+    "minimum_coverage": 0.6666666666666666,
+    "formula": "100 * PASS / (PASS + FAIL); NEEDS_REVIEW excluded and reported through coverage",
+    "error_penalty": "none; FAIL already contributes zero and is not double-penalized"
+  },
+  "averaged_correctness_experiment": {
+    "enabled": false,
+    "default_sample_count": 5,
+    "comparison_sample_counts": [3, 5, 7],
+    "normalized_centers_start": 0.1,
+    "normalized_centers_end": 0.9,
+    "crop_fraction": 0.5,
+    "target_frames": 60,
+    "raw_threshold": 0.61,
+    "calibrated_threshold": 0.7073750795830384,
+    "mode": "comparison_only",
+    "changes_active_assessment": false,
+    "provisional_score_formula": "100 * mean_based_raw_PASS / AI_repetitions",
+    "ground_truth_required_for_accuracy_claim": true
+  }
+}

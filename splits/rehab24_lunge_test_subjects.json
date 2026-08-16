@@ -1,0 +1,24 @@
+{
+  "split": "test",
+  "subjects": [
+    "5",
+    "7"
+  ],
+  "seed": 42,
+  "method": "exhaustive_metadata_balance_5_1_2_subjects",
+  "statistics": {
+    "subjects": [
+      "5",
+      "7"
+    ],
+    "repetitions": 45,
+    "correct": 23,
+    "incorrect": 22,
+    "camera_samples": 90,
+    "orientations": {
+      "front": 23,
+      "half-profile": 22
+    }
+  },
+  "assignment_sha256": "85698df18b434bfaa338113b7265d87b62ce834309ad5af2daed041daf5a1d64"
+}

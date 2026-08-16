@@ -1,0 +1,27 @@
+{
+  "split": "validation",
+  "subjects": [
+    "8"
+  ],
+  "seed": 42,
+  "method": "exhaustive_metadata_balance_over_10_subjects",
+  "statistics": {
+    "subjects": [
+      "8"
+    ],
+    "repetitions": 10,
+    "correct": 5,
+    "incorrect": 5,
+    "correct_percent": 50.0,
+    "camera_samples": 20,
+    "camera_distribution": {
+      "Camera17": 10,
+      "Camera18": 10
+    },
+    "orientation_distribution": {
+      "profile": 10
+    }
+  },
+  "assignment_sha256": "4a4a7337cc6ca210534ce4fd0d4d52eee02798fadc54c008258f259485c13621",
+  "exercise_scope": "REHAB24 Ex3 table/incline Push-up only"
+}

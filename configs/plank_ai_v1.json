@@ -1,0 +1,9 @@
+{
+  "status": "Engineering MVP / Learned Assessment Unavailable",
+  "scope": "Marching Plank primary variation; not static hold",
+  "learned_boundary": null,
+  "learned_correctness": null,
+  "detailed_error_model": null,
+  "performance_score": null,
+  "reason": "No local subject, temporal-boundary, correctness, or detailed-error labels"
+}

@@ -1,0 +1,202 @@
+{
+  "epochs": [
+    {
+      "epoch": 1,
+      "train_loss": 1.3997119426727296,
+      "validation_loss": 1.326783292152932,
+      "validation_window_macro_f1": 0.35009294937998126,
+      "validation_video_macro_f1": 0.3700623700623701,
+      "learning_rate": 0.0003,
+      "gradient_norm_mean": 6.201098549365997,
+      "gradient_norm_max": 10.031728744506836,
+      "embedding_mean": -2.6562996936263517e-05,
+      "embedding_std": 1.001567006111145,
+      "logit_mean": -0.04015490040183067,
+      "logit_std": 1.2759100198745728,
+      "prediction_class_distribution": {
+        "jumping_jack": 367,
+        "pull_up": 377,
+        "push_up": 391,
+        "situp": 0,
+        "squat": 0
+      },
+      "motionbert_all_gradients_none": true
+    },
+    {
+      "epoch": 2,
+      "train_loss": 1.2458045721054076,
+      "validation_loss": 1.33569953012654,
+      "validation_window_macro_f1": 0.3846962142085699,
+      "validation_video_macro_f1": 0.4023768146782049,
+      "learning_rate": 0.0003,
+      "gradient_norm_mean": 6.424495255947113,
+      "gradient_norm_max": 16.343730926513672,
+      "embedding_mean": -7.66598077461822e-06,
+      "embedding_std": 1.0021699666976929,
+      "logit_mean": -0.1257956176996231,
+      "logit_std": 1.934648871421814,
+      "prediction_class_distribution": {
+        "jumping_jack": 204,
+        "pull_up": 605,
+        "push_up": 223,
+        "situp": 103,
+        "squat": 0
+      },
+      "motionbert_all_gradients_none": true
+    },
+    {
+      "epoch": 3,
+      "train_loss": 1.2174804925918579,
+      "validation_loss": 1.329795374941658,
+      "validation_window_macro_f1": 0.31809055991734914,
+      "validation_video_macro_f1": 0.31428571428571433,
+      "learning_rate": 0.0003,
+      "gradient_norm_mean": 7.57633284330368,
+      "gradient_norm_max": 13.800281524658203,
+      "embedding_mean": -3.329025275888853e-05,
+      "embedding_std": 1.0026123523712158,
+      "logit_mean": -0.1530192494392395,
+      "logit_std": 1.555975079536438,
+      "prediction_class_distribution": {
+        "jumping_jack": 321,
+        "pull_up": 586,
+        "push_up": 180,
+        "situp": 48,
+        "squat": 0
+      },
+      "motionbert_all_gradients_none": true
+    },
+    {
+      "epoch": 4,
+      "train_loss": 1.2476168006658555,
+      "validation_loss": 1.1838355122829303,
+      "validation_window_macro_f1": 0.5511048737550712,
+      "validation_video_macro_f1": 0.5850579527998884,
+      "learning_rate": 0.0003,
+      "gradient_norm_mean": 10.373211610317231,
+      "gradient_norm_max": 25.62486457824707,
+      "embedding_mean": -5.4701376939192414e-05,
+      "embedding_std": 1.002811312675476,
+      "logit_mean": -0.0704316794872284,
+      "logit_std": 1.5713233947753906,
+      "prediction_class_distribution": {
+        "jumping_jack": 332,
+        "pull_up": 339,
+        "push_up": 201,
+        "situp": 263,
+        "squat": 0
+      },
+      "motionbert_all_gradients_none": true
+    },
+    {
+      "epoch": 5,
+      "train_loss": 1.1408517569303513,
+      "validation_loss": 1.2831904354019903,
+      "validation_window_macro_f1": 0.44318315840371697,
+      "validation_video_macro_f1": 0.4943650793650794,
+      "learning_rate": 0.0003,
+      "gradient_norm_mean": 11.010414981842041,
+      "gradient_norm_max": 28.55189323425293,
+      "embedding_mean": -8.932787750381976e-05,
+      "embedding_std": 1.0028356313705444,
+      "logit_mean": -0.025772646069526672,
+      "logit_std": 1.5384974479675293,
+      "prediction_class_distribution": {
+        "jumping_jack": 413,
+        "pull_up": 463,
+        "push_up": 188,
+        "situp": 69,
+        "squat": 2
+      },
+      "motionbert_all_gradients_none": true
+    },
+    {
+      "epoch": 6,
+      "train_loss": 1.0749560058116914,
+      "validation_loss": 1.4310409589162307,
+      "validation_window_macro_f1": 0.41758377167621746,
+      "validation_video_macro_f1": 0.42360345536816124,
+      "learning_rate": 0.0003,
+      "gradient_norm_mean": 19.820842182636262,
+      "gradient_norm_max": 52.462852478027344,
+      "embedding_mean": -7.83759169280529e-05,
+      "embedding_std": 1.0020238161087036,
+      "logit_mean": 0.14593881368637085,
+      "logit_std": 2.092986822128296,
+      "prediction_class_distribution": {
+        "jumping_jack": 736,
+        "pull_up": 13,
+        "push_up": 243,
+        "situp": 87,
+        "squat": 56
+      },
+      "motionbert_all_gradients_none": true
+    },
+    {
+      "epoch": 7,
+      "train_loss": 1.0662286818027495,
+      "validation_loss": 1.1499415359813983,
+      "validation_window_macro_f1": 0.5342287235688594,
+      "validation_video_macro_f1": 0.5421358445201363,
+      "learning_rate": 0.0003,
+      "gradient_norm_mean": 16.52454220056534,
+      "gradient_norm_max": 41.32946014404297,
+      "embedding_mean": -0.00010432204726384953,
+      "embedding_std": 1.0027772188186646,
+      "logit_mean": 0.04188225045800209,
+      "logit_std": 1.7505091428756714,
+      "prediction_class_distribution": {
+        "jumping_jack": 233,
+        "pull_up": 477,
+        "push_up": 210,
+        "situp": 209,
+        "squat": 6
+      },
+      "motionbert_all_gradients_none": true
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.8951995372772217,
+      "validation_loss": 1.1890624154680474,
+      "validation_window_macro_f1": 0.5460957685441439,
+      "validation_video_macro_f1": 0.5685925296375614,
+      "learning_rate": 0.0003,
+      "gradient_norm_mean": 17.4718879699707,
+      "gradient_norm_max": 41.58452224731445,
+      "embedding_mean": -7.911932334536687e-05,
+      "embedding_std": 1.0022286176681519,
+      "logit_mean": 0.09144193679094315,
+      "logit_std": 2.39618182182312,
+      "prediction_class_distribution": {
+        "jumping_jack": 487,
+        "pull_up": 220,
+        "push_up": 224,
+        "situp": 154,
+        "squat": 50
+      },
+      "motionbert_all_gradients_none": true
+    }
+  ],
+  "sampling": {
+    "strategy": "video_balanced_fixed_cap_1_representative_windows_per_video;frozen_motionbert_features_precomputed_float16_in_memory;no_class_reweighting",
+    "full_train_videos": 314,
+    "available_windows": 5124,
+    "sampled_windows_per_epoch": 314,
+    "windows_per_video_available": {
+      "min": 1,
+      "p50": 16.0,
+      "p90": 28.0,
+      "p95": 28.0,
+      "max": 29,
+      "mean": 16.318471337579616
+    },
+    "maximum_single_video_contribution_percentage": 0.3184713375796178,
+    "sampled_windows_per_class_per_epoch": {
+      "jumping_jack": 75,
+      "pull_up": 71,
+      "push_up": 69,
+      "situp": 54,
+      "squat": 45
+    }
+  }
+}

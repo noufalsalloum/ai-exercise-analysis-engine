@@ -1,0 +1,166 @@
+{
+    "exercise": {
+        "id": "lunge",
+        "name": "Lunge",
+        "family": "unilateral_lower_body",
+        "category": "strength",
+        "difficulty": "beginner",
+        "muscles": [
+            "quadriceps",
+            "glutes",
+            "hamstrings",
+            "core"
+        ]
+    },
+
+    "input": {
+        "camera_views": [
+            "side",
+            "diagonal"
+        ],
+        "max_people": 1,
+        "min_fps": 30,
+        "min_resolution": [
+            720,
+            1280
+        ]
+    },
+
+    "landmarks": {
+        "model": "mediapipe_blazepose",
+
+        "selected_landmarks": [
+            "LEFT_SHOULDER",
+            "RIGHT_SHOULDER",
+            "LEFT_HIP",
+            "RIGHT_HIP",
+            "LEFT_KNEE",
+            "RIGHT_KNEE",
+            "LEFT_ANKLE",
+            "RIGHT_ANKLE"
+        ],
+
+        "tracking_landmarks": [
+            "LEFT_HIP",
+            "LEFT_KNEE",
+            "LEFT_ANKLE"
+        ],
+
+        "angle_definitions": {
+            "front_knee_angle": [
+                "LEFT_HIP",
+                "LEFT_KNEE",
+                "LEFT_ANKLE"
+            ],
+            "back_knee_angle": [
+                "RIGHT_HIP",
+                "RIGHT_KNEE",
+                "RIGHT_ANKLE"
+            ]
+        },
+
+        "symmetry_pairs": [
+            [
+                "LEFT_KNEE",
+                "RIGHT_KNEE"
+            ],
+            [
+                "LEFT_ANKLE",
+                "RIGHT_ANKLE"
+            ]
+        ]
+    },
+
+    "movement": {
+        "movement_type": "Dynamic",
+        "movement_plane": "Sagittal",
+        "movement_direction": "Vertical",
+
+        "primary_joint": "knee",
+
+        "secondary_joints": [
+            "hip",
+            "ankle"
+        ],
+
+        "phases": [
+            "standing",
+            "stepping_forward",
+            "lowest_point",
+            "returning"
+        ]
+    },
+
+    "features": {
+        "joint_angles": true,
+        "velocity": true,
+        "acceleration": false,
+        "angular_velocity": true,
+        "angular_acceleration": false,
+        "rom": true,
+        "stability": true,
+        "symmetry": true,
+        "trajectory": true
+    },
+
+    "labels": {
+        "valid_phases": ["REST", "DESCENDING", "BOTTOM", "RETURNING"],
+        "valid_errors": [],
+        "possible_errors": [],
+
+        "phase_classes": [
+            "standing",
+            "stepping_forward",
+            "lowest_point",
+            "returning"
+        ],
+
+        "pass_fail_classes": [
+            "pass",
+            "fail"
+        ]
+    },
+
+    "reference": {
+        "expected_rom": {
+            "front_knee_angle": [80.0, 175.0]
+        },
+        "phase_reference": {
+            "bottom_threshold_velocity": 0.05
+        }
+    },
+
+    "metadata": {
+        "schema_version": "2.0.0",
+        "author": "AI Engine Team",
+        "last_updated": "2026-07-29"
+    },
+    "runtime": {
+        "supported_variation": "rehab24_lunge",
+        "calibration_source": "REHAB24 Ex5 GT repetition signal percentiles; side/half-profile only",
+        "repetition_definition": "standing -> descending -> bottom -> ascending -> standing",
+        "repetition_counter": {
+            "min_landmark_confidence": 0.55,
+            "angle_smoothing_window": 5,
+            "pelvis_smoothing_window": 5,
+            "side_confidence_window": 12,
+            "side_switch_margin": 0.15,
+            "side_switch_confirm_frames": 5,
+            "standing_ready_angle": 160.0,
+            "descent_enter_angle": 145.0,
+            "bottom_enter_angle": 120.0,
+            "bottom_exit_angle": 132.0,
+            "standing_return_angle": 160.0,
+            "descent_start_displacement": 0.01,
+            "minimum_pelvis_displacement": 0.04,
+            "return_pelvis_tolerance": 0.035,
+            "ascent_displacement_hysteresis": 0.01,
+            "minimum_knee_rom": 35.0,
+            "minimum_hip_rom": 12.0,
+            "minimum_repetition_duration": 0.4,
+            "maximum_repetition_duration": 6.0,
+            "cooldown_seconds": 0.25,
+            "max_low_confidence_gap_frames": 4
+        }
+    }
+}

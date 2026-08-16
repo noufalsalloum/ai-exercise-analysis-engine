@@ -1,0 +1,167 @@
+{
+    "exercise": {
+        "id": "pullup",
+        "name": "Pull-up",
+        "family": "bilateral_upper_body",
+        "category": "strength",
+        "difficulty": "intermediate",
+        "muscles": [
+            "lats",
+            "biceps",
+            "upper_back",
+            "core"
+        ]
+    },
+
+    "input": {
+        "camera_views": [
+            "front",
+            "side"
+        ],
+        "max_people": 1,
+        "min_fps": 30,
+        "min_resolution": [
+            720,
+            1280
+        ]
+    },
+
+    "landmarks": {
+        "model": "mediapipe_blazepose",
+
+        "selected_landmarks": [
+            "LEFT_WRIST",
+            "RIGHT_WRIST",
+            "LEFT_ELBOW",
+            "RIGHT_ELBOW",
+            "LEFT_SHOULDER",
+            "RIGHT_SHOULDER",
+            "LEFT_HIP",
+            "RIGHT_HIP"
+        ],
+
+        "tracking_landmarks": [
+            "LEFT_WRIST",
+            "LEFT_ELBOW",
+            "LEFT_SHOULDER"
+        ],
+
+        "angle_definitions": {
+            "elbow_angle": [
+                "LEFT_SHOULDER",
+                "LEFT_ELBOW",
+                "LEFT_WRIST"
+            ],
+            "shoulder_angle": [
+                "LEFT_HIP",
+                "LEFT_SHOULDER",
+                "LEFT_ELBOW"
+            ]
+        },
+
+        "symmetry_pairs": [
+            [
+                "LEFT_ELBOW",
+                "RIGHT_ELBOW"
+            ],
+            [
+                "LEFT_SHOULDER",
+                "RIGHT_SHOULDER"
+            ]
+        ]
+    },
+
+    "movement": {
+        "movement_type": "Dynamic",
+        "movement_plane": "Frontal",
+        "movement_direction": "Vertical",
+
+        "primary_joint": "elbow",
+
+        "secondary_joints": [
+            "shoulder"
+        ],
+
+        "phases": [
+            "hanging",
+            "pulling_up",
+            "top_position",
+            "descending"
+        ]
+    },
+
+    "features": {
+        "joint_angles": true,
+        "velocity": true,
+        "acceleration": false,
+        "angular_velocity": true,
+        "angular_acceleration": false,
+        "rom": true,
+        "stability": true,
+        "symmetry": false,
+        "trajectory": true
+    },
+
+    "labels": {
+        "valid_phases": ["REST", "ASCENDING", "TOP", "DESCENDING"],
+        "valid_errors": ["incomplete_rom", "kipping_momentum", "chin_below_bar"],
+        "possible_errors": [
+            "incomplete_rom",
+            "kipping_momentum",
+            "chin_below_bar"
+        ],
+
+        "phase_classes": [
+            "hanging",
+            "pulling_up",
+            "top_position",
+            "descending"
+        ],
+
+        "pass_fail_classes": [
+            "pass",
+            "fail"
+        ]
+    },
+
+    "reference": {
+        "expected_rom": {
+            "elbow_angle": [45.0, 165.0]
+        },
+        "phase_reference": {
+            "bottom_threshold_velocity": 0.05
+        }
+    },
+
+    "runtime": {
+        "repetition_counter": {
+            "min_landmark_confidence": 0.55,
+            "angle_smoothing_window": 5,
+            "vertical_smoothing_window": 5,
+            "side_confidence_window": 12,
+            "side_switch_margin": 0.15,
+            "side_switch_confirm_frames": 5,
+            "hang_ready_angle": 150.0,
+            "ascent_enter_angle": 140.0,
+            "top_enter_angle": 95.0,
+            "top_exit_angle": 112.0,
+            "hang_return_angle": 150.0,
+            "ascent_start_displacement": 0.015,
+            "minimum_vertical_displacement": 0.055,
+      "return_vertical_tolerance": 0.08,
+            "descent_displacement_hysteresis": 0.015,
+            "minimum_elbow_range": 55.0,
+            "minimum_repetition_duration": 0.6,
+            "maximum_repetition_duration": 10.0,
+            "cooldown_seconds": 0.3,
+            "wrist_above_shoulder_tolerance": 0.08,
+            "max_low_confidence_gap_frames": 4
+        }
+    },
+
+    "metadata": {
+        "schema_version": "2.0.0",
+        "author": "AI Engine Team",
+        "last_updated": "2026-07-29"
+    }
+}

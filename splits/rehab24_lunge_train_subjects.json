@@ -1,0 +1,30 @@
+{
+  "split": "train",
+  "subjects": [
+    "3",
+    "4",
+    "6",
+    "8",
+    "9"
+  ],
+  "seed": 42,
+  "method": "exhaustive_metadata_balance_5_1_2_subjects",
+  "statistics": {
+    "subjects": [
+      "3",
+      "4",
+      "6",
+      "8",
+      "9"
+    ],
+    "repetitions": 109,
+    "correct": 45,
+    "incorrect": 64,
+    "camera_samples": 218,
+    "orientations": {
+      "front": 55,
+      "half-profile": 54
+    }
+  },
+  "assignment_sha256": "85698df18b434bfaa338113b7265d87b62ce834309ad5af2daed041daf5a1d64"
+}

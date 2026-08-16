@@ -1,0 +1,9 @@
+{
+  "enabled": true,
+  "checkpoint": "checkpoints/squat_ai_v2/rep_boundary/best.pt",
+  "output_dir": "results/squat_ai_v3/shadow",
+  "device": "auto",
+  "minimum_frames": 38,
+  "contract": "preprocessing_v4_(T,17,3)_x_y_confidence",
+  "user_facing_count_source": "rule_based_only"
+}

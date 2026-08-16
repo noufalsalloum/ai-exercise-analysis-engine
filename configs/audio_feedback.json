@@ -1,0 +1,18 @@
+{
+  "schema_version": "audio_feedback_v1",
+  "enabled": true,
+  "default_language": "ar",
+  "language_environment_variable": "AI_ENGINE_AUDIO_LANGUAGE",
+  "event_cooldown_seconds": 3.0,
+  "completion_cooldown_seconds": 2.75,
+  "maximum_synthesis_seconds": 8.0,
+  "cache_dir": null,
+  "prewarm_enabled": true,
+  "prewarm_languages": ["ar", "en"],
+  "fallback_order": ["neural_or_cache", "windows_sapi", "beep"],
+  "voices": {
+    "ar": "ar-SA-HamedNeural",
+    "en": "en-US-AriaNeural"
+  },
+  "supported_events": ["first_repetition_completed"]
+}

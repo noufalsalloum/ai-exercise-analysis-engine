@@ -1,0 +1,163 @@
+{
+    "exercise": {
+        "id": "pushup",
+        "name": "Push-up",
+        "family": "bilateral_upper_body",
+        "category": "strength",
+        "difficulty": "beginner",
+        "muscles": [
+            "chest",
+            "triceps",
+            "anterior_deltoids",
+            "core"
+        ]
+    },
+
+    "input": {
+        "camera_views": [
+            "side",
+            "diagonal"
+        ],
+        "max_people": 1,
+        "min_fps": 30,
+        "min_resolution": [
+            720,
+            1280
+        ]
+    },
+
+    "landmarks": {
+        "model": "mediapipe_blazepose",
+
+        "selected_landmarks": [
+            "LEFT_SHOULDER",
+            "RIGHT_SHOULDER",
+            "LEFT_ELBOW",
+            "RIGHT_ELBOW",
+            "LEFT_WRIST",
+            "RIGHT_WRIST",
+            "LEFT_HIP",
+            "RIGHT_HIP",
+            "LEFT_ANKLE",
+            "RIGHT_ANKLE"
+        ],
+
+        "tracking_landmarks": [
+            "LEFT_SHOULDER",
+            "LEFT_ELBOW",
+            "LEFT_WRIST"
+        ],
+
+        "angle_definitions": {
+            "elbow_angle": [
+                "LEFT_SHOULDER",
+                "LEFT_ELBOW",
+                "LEFT_WRIST"
+            ],
+            "hip_alignment": [
+                "LEFT_SHOULDER",
+                "LEFT_HIP",
+                "LEFT_ANKLE"
+            ]
+        },
+
+        "symmetry_pairs": [
+            [
+                "LEFT_ELBOW",
+                "RIGHT_ELBOW"
+            ],
+            [
+                "LEFT_SHOULDER",
+                "RIGHT_SHOULDER"
+            ]
+        ]
+    },
+
+    "movement": {
+        "movement_type": "Dynamic",
+        "movement_plane": "Sagittal",
+        "movement_direction": "Vertical",
+
+        "primary_joint": "elbow",
+
+        "secondary_joints": [
+            "shoulder",
+            "hip"
+        ],
+
+        "phases": [
+            "plank_position",
+            "lowering",
+            "bottom",
+            "pushing_up"
+        ]
+    },
+
+    "features": {
+        "joint_angles": true,
+        "velocity": true,
+        "acceleration": false,
+        "angular_velocity": true,
+        "angular_acceleration": false,
+        "rom": true,
+        "stability": true,
+        "symmetry": false,
+        "trajectory": true
+    },
+
+    "labels": {
+        "valid_phases": ["TOP", "DESCENDING", "BOTTOM", "ASCENDING"],
+        "valid_errors": ["sagging_hips", "incomplete_rom", "flaring_elbows"],
+        "possible_errors": [
+            "sagging_hips",
+            "incomplete_rom",
+            "flaring_elbows"
+        ],
+
+        "phase_classes": [
+            "plank_position",
+            "lowering",
+            "bottom",
+            "pushing_up"
+        ],
+
+        "pass_fail_classes": [
+            "pass",
+            "fail"
+        ]
+    },
+
+    "reference": {
+        "expected_rom": {
+            "elbow_angle": [70.0, 175.0]
+        },
+        "phase_reference": {
+            "bottom_threshold_velocity": 0.05
+        }
+    },
+
+    "runtime": {
+        "repetition_counter": {
+            "min_landmark_confidence": 0.55,
+            "side_confidence_window": 12,
+            "side_switch_margin": 0.15,
+            "side_switch_confirm_frames": 5,
+            "angle_smoothing_window": 5,
+            "top_enter_angle": 155.0,
+            "descent_enter_angle": 145.0,
+            "bottom_enter_angle": 115.0,
+            "bottom_exit_angle": 125.0,
+            "min_range_of_motion": 45.0,
+            "min_repetition_duration": 0.35,
+            "max_repetition_duration": 8.0,
+            "cooldown_seconds": 0.25,
+            "max_low_confidence_gap_frames": 4
+        }
+    },
+
+    "metadata": {
+        "schema_version": "2.0.0",
+        "author": "AI Engine Team",
+        "last_updated": "2026-07-29"
+    }
+}

@@ -1,0 +1,8 @@
+{
+  "status": "Development / External Validation Required",
+  "scope": "REHAB24 Ex3 table/incline Push-up only",
+  "preprocessing_version": "physical_mp33_h36m_root_body_scale_xy_conf_pad_v4",
+  "standard_floor_session_enabled": false,
+  "detailed_error_model": null,
+  "score_formula": "100 * PASS / (PASS + FAIL); needs-review excluded"
+}

@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Dynamic Exercise Repetition Annotations",
+  "type": "object",
+  "required": ["video_id", "subject_id", "exercise_family", "variation", "repetitions"],
+  "properties": {
+    "video_id": {"type": "string", "minLength": 1},
+    "subject_id": {"type": "string", "minLength": 1},
+    "exercise_family": {"enum": ["pushup", "pullup", "plank", "lunge"]},
+    "variation": {"type": "string", "minLength": 1},
+    "camera_id": {"type": ["string", "null"]},
+    "view": {"type": ["string", "null"]},
+    "fps": {"type": ["number", "null"], "exclusiveMinimum": 0},
+    "repetitions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["start_frame", "end_frame", "correctness"],
+        "properties": {
+          "start_frame": {"type": "integer", "minimum": 0},
+          "end_frame": {"type": "integer", "minimum": 1},
+          "correctness": {"enum": ["correct", "incorrect", "unknown"]},
+          "error": {"type": ["string", "null"]},
+          "annotator_id": {"type": ["string", "null"]},
+          "review_status": {"enum": ["unreviewed", "reviewed", "adjudicated"]}
+        }
+      }
+    }
+  }
+}

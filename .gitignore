@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Local/runtime caches
+.cache/
+audio_cache/
+.ipynb_checkpoints/
+
+# Datasets and generated data
+datasets/
+results/
+archive/
+
+# Local patch/package copies
+AI_Engine_Backend_Integration_Patch/
+
+# Environments
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Secrets
+.env
+.env.*
