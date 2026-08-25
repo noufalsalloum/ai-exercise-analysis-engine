@@ -1,0 +1,59 @@
+# RunPod Serverless (Load Balancer endpoint) image for the exercise-analysis
+# API — the *same* api/main.py FastAPI app the Cloud Run Dockerfile runs, no
+# handler.py, no runpod SDK. See RUNPOD.md for why: RunPod's Load Balancer
+# endpoint type routes HTTP requests straight to a plain HTTP server running
+# in the container (docs.runpod.io/serverless/load-balancing/overview) — a
+# handler function (runpod.serverless.start()) is only required for the
+# other endpoint type (Queue), which this deployment does not use.
+#
+# The only real difference from ./Dockerfile: torch is installed from
+# PyTorch's CUDA wheel index instead of the CPU-only one, since RunPod
+# Serverless is GPU infrastructure. inference/squat_ai_mvp.py,
+# pushup_ai_mvp.py, and lunge_ai_mvp.py already do
+# `torch.device("cuda" if torch.cuda.is_available() else "cpu")` — so this
+# is a dependency-layer swap only; zero application code changed to use the
+# GPU. cu121 is a broadly-compatible default — if the GPU type you pick in
+# the RunPod console needs a newer CUDA runtime, change the index URL below
+# (torch 2.5.1 also has cu118 and cu124 builds available).
+#
+# NOTE: like ./Dockerfile, this has been written but never built — no CUDA
+# GPU or Docker daemon was available in the environment that wrote it. Build
+# and smoke-test before pointing RunPod at it — see RUNPOD.md.
+
+FROM python:3.11-slim
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    libgl1 \
+    libglib2.0-0 \
+    libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY requirements-api.lock.txt .
+RUN pip install --no-cache-dir torch==2.5.1 --index-url https://download.pytorch.org/whl/cu121 \
+    && pip install --no-cache-dir -r requirements-api.lock.txt
+
+RUN mkdir -p /app/mediapipe_models && \
+    curl -f -sSL \
+    "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/latest/pose_landmarker_full.task" \
+    -o /app/mediapipe_models/pose_landmarker_full.task
+
+COPY . .
+
+RUN useradd --create-home --uid 1000 appuser && chown -R appuser:appuser /app
+USER appuser
+
+ENV PYTHONPATH=/app \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+
+# RunPod's Load Balancer injects PORT (default 80) and PORT_HEALTH (default
+# same as PORT) — uvicorn must read PORT, same as the Cloud Run image does.
+EXPOSE 80
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=90s --retries=3 \
+    CMD curl -f "http://localhost:${PORT:-80}/ping" || exit 1
+
+CMD ["sh", "-c", "exec uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-80}"]

@@ -1,0 +1,30 @@
+# Not needed at runtime — training/, evaluation/, tools/, tests/, ui/, and
+# datasets/ are development-only. Keeping them out of the build context also
+# keeps `gcloud run deploy --source .` / Cloud Build upload fast.
+.git/
+.github/
+.vscode/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+
+training/
+evaluation/
+tools/
+tests/
+ui/
+datasets/
+archive/
+docs/
+results/
+splits/
+
+# Desktop-only entry point (imports tkinter). ui/ above (which imports
+# PIL.ImageTk) is the only other tkinter-coupled code, and it's already excluded.
+run_application.py
+
+# Local dev artifacts, never part of the image.
+.env
+*.log
+prototype_store/

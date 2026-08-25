@@ -18,8 +18,6 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from datasets.adapters.rehab24 import Rehab24RepetitionSample, Rehab24SquatAdapter
-from datasets.adapters.rehab24_split import balanced_subject_split
 from input_sources.pose_stream import PoseStreamProcessor
 from preprocessing.h36m_coordinate_normalizer import H36MCoordinateNormalizer
 from preprocessing.landmark_selector import LandmarkSelector
@@ -123,6 +121,15 @@ def write_metadata(project: Path, adapter: Rehab24SquatAdapter, samples: list[Re
 
 
 def main() -> None:
+    # Imported here, not at module level: this dataset-prep script is the
+    # only thing in this file that needs it, and inference/squat_ai_mvp.py
+    # and inference/pushup_ai_mvp.py import this module's resample_sequence()
+    # for production inference — they must not be forced to depend on the
+    # datasets/ package (gitignored, dev-machine-only, not part of the
+    # deployed image) just to reach an unrelated function.
+    from datasets.adapters.rehab24 import Rehab24RepetitionSample, Rehab24SquatAdapter
+    from datasets.adapters.rehab24_split import balanced_subject_split
+
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--external-root", type=Path, default=Path("datasets/external"))
     parser.add_argument("--cache-dir", type=Path, default=Path("datasets/window_cache/rehab24_squat_v1"))

@@ -1,0 +1,24 @@
+# Cloud Run API image dependencies.
+#
+# NOT a `pip freeze` output — there is no environment in this workspace able
+# to run pip/resolve a real dependency graph (no Python ML stack installed
+# here; see CLOUD_RUN.md "Before your first deploy"). These are best-effort,
+# known-compatible pins. Before the first real deploy, build the image once,
+# run `pip freeze` inside it, and replace this file with the real resolved
+# lock so "requirements-api.lock.txt" is actually a lock file, not a guess.
+#
+# torch is installed separately in the Dockerfile from PyTorch's CPU-only
+# wheel index — Cloud Run has no GPU, and the default PyPI torch wheel pulls
+# multi-GB CUDA dependencies for nothing. Do not add torch here.
+
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+python-multipart==0.0.20
+httpx==0.28.1
+pydantic==2.10.4
+
+numpy==1.26.4
+pandas==2.2.3
+opencv-python-headless==4.10.0.84
+mediapipe==0.10.18
+Pillow==11.0.0
