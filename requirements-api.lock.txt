@@ -1,15 +1,20 @@
-# Cloud Run API image dependencies.
+# Cloud Run / RunPod API image dependencies.
 #
-# NOT a `pip freeze` output — there is no environment in this workspace able
-# to run pip/resolve a real dependency graph (no Python ML stack installed
-# here; see CLOUD_RUN.md "Before your first deploy"). These are best-effort,
-# known-compatible pins. Before the first real deploy, build the image once,
-# run `pip freeze` inside it, and replace this file with the real resolved
-# lock so "requirements-api.lock.txt" is actually a lock file, not a guess.
+# Installed and actually exercised in a real venv (Python 3.11.9, win_amd64)
+# against `api.main`'s real, full import chain — not just a static read.
+# That exercise is what caught scikit-learn's absence below: it isn't a
+# direct api/ dependency, but training/squat_correctness.py's
+# `from sklearn.metrics import ...` is reached at import time via
+# application.workers -> inference.squat_ai_mvp -> training.squat_correctness
+# (see .dockerignore's comment on why training/ ships at all). Still not a
+# real `pip freeze` — no Docker/GPU environment has run the actual container
+# build. If you regenerate this from `pip freeze` inside a real build, keep
+# scikit-learn in it; a static dependency read alone will not surface it
+# (matplotlib and scipy are also reachable in the container, but arrive as
+# mediapipe's own transitive dependencies — nothing to pin for those here).
 #
-# torch is installed separately in the Dockerfile from PyTorch's CPU-only
-# wheel index — Cloud Run has no GPU, and the default PyPI torch wheel pulls
-# multi-GB CUDA dependencies for nothing. Do not add torch here.
+# torch is installed separately in the Dockerfile(s) — CPU-only wheel index
+# for Cloud Run (no GPU), CUDA wheel index for RunPod. Do not add torch here.
 
 fastapi==0.115.6
 uvicorn[standard]==0.34.0
@@ -22,3 +27,4 @@ pandas==2.2.3
 opencv-python-headless==4.10.0.84
 mediapipe==0.10.18
 Pillow==11.0.0
+scikit-learn==1.9.0

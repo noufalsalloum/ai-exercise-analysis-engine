@@ -1,6 +1,20 @@
-# Not needed at runtime — training/, evaluation/, tools/, tests/, ui/, and
-# datasets/ are development-only. Keeping them out of the build context also
-# keeps `gcloud run deploy --source .` / Cloud Build upload fast.
+# Not needed at runtime — evaluation/, tests/, ui/, and datasets/ are
+# development-only. Keeping them out of the build context also keeps
+# `gcloud run deploy --source .` / Cloud Build upload fast.
+#
+# tools/ and training/ are NOT in this list, on purpose, even though most of
+# each genuinely is dev-only:
+#   - inference/squat_ai_mvp.py and inference/pushup_ai_mvp.py import
+#     resample_sequence from tools/squat_ai/prepare_rehab24_squat.py.
+#   - inference/squat_ai_mvp.py, pushup_ai_mvp.py, lunge_ai_mvp.py, and
+#     application/squat_shadow.py import v2_segments from
+#     training/squat_rep_boundary_v2.py; squat_ai_mvp.py also imports
+#     load_checkpoint_strict from training/squat_correctness.py.
+# Excluding either directory reproduced a real
+# `ModuleNotFoundError: No module named 'tools'` (or 'training') on every
+# single container start, since application.workers unconditionally imports
+# inference.squat_ai_mvp regardless of which exercise family is requested —
+# confirmed by hiding each directory locally and importing api.main.
 .git/
 .github/
 .vscode/
@@ -9,9 +23,7 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 
-training/
 evaluation/
-tools/
 tests/
 ui/
 datasets/
