@@ -12,9 +12,22 @@
 # pushup_ai_mvp.py, and lunge_ai_mvp.py already do
 # `torch.device("cuda" if torch.cuda.is_available() else "cpu")` — so this
 # is a dependency-layer swap only; zero application code changed to use the
-# GPU. cu121 is a broadly-compatible default — if the GPU type you pick in
-# the RunPod console needs a newer CUDA runtime, change the index URL below
-# (torch 2.5.1 also has cu118 and cu124 builds available).
+# GPU.
+#
+# torch==2.6.0 / cu124 (bumped from 2.5.1 / cu121): the deployed squat
+# experimental checkpoints (boundary_v2, correctness_v3, error_v1) were
+# failing `torch.load(..., weights_only=True)` on this image with
+# `WeightsUnpickler error: Unsupported operand 118` — a known, unresolved
+# upstream PyTorch bug (pytorch/pytorch#150998), not a problem with the
+# checkpoint files themselves (verified safe by disassembling their pickle
+# streams: only standard collections.OrderedDict / torch.FloatStorage /
+# torch._utils._rebuild_tensor_v2 globals, nothing exotic). 2.6.0 is the
+# smallest version step past 2.5.1 plausible to include a fix, and cu124
+# keeps the CUDA jump small (12.1->12.4, still CUDA 12.x) rather than the
+# 12.6/12.8 that 2.7+ requires. weights_only stays True — do not change
+# that; if this bump doesn't fix the load failure, the checkpoints
+# themselves already proved safe enough to reconsider weights_only=False
+# for just these three load sites, but that is a separate decision.
 #
 # NOTE: like ./Dockerfile, this has been written but never built — no CUDA
 # GPU or Docker daemon was available in the environment that wrote it. Build
@@ -32,7 +45,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 COPY requirements-api.lock.txt .
-RUN pip install --no-cache-dir torch==2.5.1 --index-url https://download.pytorch.org/whl/cu121 \
+RUN pip install --no-cache-dir torch==2.6.0 --index-url https://download.pytorch.org/whl/cu124 \
     && pip install --no-cache-dir -r requirements-api.lock.txt
 
 RUN mkdir -p /app/mediapipe_models && \
