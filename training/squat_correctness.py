@@ -273,8 +273,16 @@ def save_checkpoint(
     )
 
 
-def load_checkpoint_strict(path: Path, model: SquatCorrectnessModel, device: torch.device) -> dict[str, Any]:
-    checkpoint = torch.load(path, map_location=device, weights_only=True)
+def load_checkpoint_strict(
+    path: Path, model: SquatCorrectnessModel, device: torch.device, *, weights_only: bool = True
+) -> dict[str, Any]:
+    # weights_only defaults to True (unchanged) for every caller — training
+    # scripts, evaluation, tests, and archived-checkpoint comparisons.
+    # inference/squat_ai_mvp.py is the sole caller that explicitly passes
+    # weights_only=False, scoped there to the one trusted production
+    # checkpoint (checkpoints/squat_ai_v3/correctness/final_dev.pt) — see
+    # the comment at that call site for why.
+    checkpoint = torch.load(path, map_location=device, weights_only=weights_only)
     model.expert.load_state_dict(checkpoint["expert_state_dict"], strict=True)
     model.correctness_head.load_state_dict(checkpoint["correctness_head_state_dict"], strict=True)
     return checkpoint

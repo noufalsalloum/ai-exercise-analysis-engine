@@ -86,8 +86,23 @@ class SquatBoundaryShadow:
         self.model = model
         self.checkpoint_sha256: str | None = None
         if self.model is None:
+            # weights_only=False is intentional and scoped to this one file:
+            # config.checkpoint here is checkpoints/squat_ai_v2/rep_boundary/best.pt
+            # (see configs/squat_shadow.json) — the exact same file
+            # inference/squat_ai_mvp.py loads for boundary_v2, produced by
+            # this repo's own training pipeline
+            # (training/squat_rep_boundary_v2.py), not an external/untrusted
+            # download. Its pickle stream was inspected with pickletools.dis
+            # (opcodes only, nothing executed) and contains solely
+            # collections.OrderedDict, torch.FloatStorage, and
+            # torch._utils._rebuild_tensor_v2 — a plain state_dict, no exotic
+            # types. weights_only=True rejects it on RunPod's CUDA build with
+            # `WeightsUnpickler error: Unsupported operand 118`, a known
+            # unresolved PyTorch bug (pytorch/pytorch#150998), not a problem
+            # with this file. Do not copy this pattern for a checkpoint whose
+            # provenance/content hasn't been verified.
             checkpoint = torch.load(
-                config.checkpoint, map_location=self.device, weights_only=True
+                config.checkpoint, map_location=self.device, weights_only=False
             )
             experiment = checkpoint.get("experiment", {})
             if experiment.get("architecture") != "boundary_aux_tcn":

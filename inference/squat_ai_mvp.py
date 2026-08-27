@@ -262,10 +262,22 @@ class SquatAIExperimentalOrchestrator:
 
     def _load_models(self, *, allow_partial: bool) -> None:
         try:
+            # weights_only=False is intentional and scoped to this one file:
+            # checkpoints/squat_ai_v2/rep_boundary/best.pt is produced by this
+            # repo's own training pipeline (training/squat_rep_boundary_v2.py),
+            # not an external/untrusted download. Its pickle stream was
+            # inspected with pickletools.dis (opcodes only, nothing executed)
+            # and contains solely collections.OrderedDict, torch.FloatStorage,
+            # and torch._utils._rebuild_tensor_v2 — a plain state_dict, no
+            # exotic types. weights_only=True rejects it on RunPod's CUDA
+            # build with `WeightsUnpickler error: Unsupported operand 118`, a
+            # known unresolved PyTorch bug (pytorch/pytorch#150998), not a
+            # problem with this file. Do not copy this pattern for a
+            # checkpoint whose provenance/content hasn't been verified.
             checkpoint = torch.load(
                 self.config.boundary_checkpoint,
                 map_location=self.device,
-                weights_only=True,
+                weights_only=False,
             )
             if checkpoint.get("experiment", {}).get("architecture") != "boundary_aux_tcn":
                 raise ValueError("Boundary V2 checkpoint architecture mismatch.")
@@ -282,8 +294,22 @@ class SquatAIExperimentalOrchestrator:
                 raise
         try:
             model = SquatCorrectnessModel(self.config.motionbert_checkpoint).to(self.device)
+            # weights_only=False is intentional and scoped to this one file:
+            # checkpoints/squat_ai_v3/correctness/final_dev.pt is produced by
+            # this repo's own training pipeline (training/squat_correctness.py
+            # / squat_correctness_v3.py), not an external/untrusted download.
+            # Its pickle stream was inspected with pickletools.dis (opcodes
+            # only, nothing executed) and contains solely
+            # collections.OrderedDict, torch.FloatStorage, and
+            # torch._utils._rebuild_tensor_v2 — a plain state_dict, no exotic
+            # types. weights_only=True rejects it on RunPod's CUDA build with
+            # `WeightsUnpickler error: Unsupported operand 118`, a known
+            # unresolved PyTorch bug (pytorch/pytorch#150998), not a problem
+            # with this file. load_checkpoint_strict's default stays True for
+            # every other caller — do not copy this pattern for a checkpoint
+            # whose provenance/content hasn't been verified.
             checkpoint = load_checkpoint_strict(
-                self.config.correctness_checkpoint, model, self.device
+                self.config.correctness_checkpoint, model, self.device, weights_only=False
             )
             if not bool(checkpoint.get("motionbert_frozen", False)):
                 raise ValueError("Correctness V3 does not attest frozen MotionBERT.")
@@ -299,8 +325,22 @@ class SquatAIExperimentalOrchestrator:
             if not allow_partial:
                 raise
         try:
+            # weights_only=False is intentional and scoped to this one file:
+            # checkpoints/squat_error_v1/best.pt is produced by this repo's
+            # own training pipeline (training/squat_error_v1.py), not an
+            # external/untrusted download. Its pickle stream was inspected
+            # with pickletools.dis (opcodes only, nothing executed) and
+            # contains solely collections.OrderedDict, torch.FloatStorage,
+            # and torch._utils._rebuild_tensor_v2 — a plain state_dict, no
+            # exotic types. weights_only=True rejects it on RunPod's CUDA
+            # build with `WeightsUnpickler error: Unsupported operand 118`, a
+            # known unresolved PyTorch bug (pytorch/pytorch#150998), not a
+            # problem with this file. load_squat_posture_error_checkpoint's
+            # default stays True for every other caller — do not copy this
+            # pattern for a checkpoint whose provenance/content hasn't been
+            # verified.
             model, checkpoint = load_squat_posture_error_checkpoint(
-                self.config.error_checkpoint, self.device
+                self.config.error_checkpoint, self.device, weights_only=False
             )
             if checkpoint.get("feature_version") != self.feature_extractor.VERSION:
                 raise ValueError("Error V1 feature contract mismatch.")

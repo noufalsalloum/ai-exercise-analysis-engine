@@ -75,11 +75,16 @@ class SquatPostureErrorModel(nn.Module):
 
 
 def load_squat_posture_error_checkpoint(
-    path: str | Path, device: torch.device
+    path: str | Path, device: torch.device, *, weights_only: bool = True
 ) -> tuple[SquatPostureErrorModel, dict[str, Any]]:
     """Create and strictly load the selected neural Error V1 checkpoint."""
 
-    checkpoint = torch.load(Path(path), map_location=device, weights_only=True)
+    # weights_only defaults to True (unchanged) for every caller — training,
+    # squat_error_inference.py, and tests. inference/squat_ai_mvp.py is the
+    # sole caller that explicitly passes weights_only=False, scoped there to
+    # the one trusted production checkpoint (checkpoints/squat_error_v1/best.pt)
+    # — see the comment at that call site for why.
+    checkpoint = torch.load(Path(path), map_location=device, weights_only=weights_only)
     if checkpoint.get("model_type") != "small_mlp":
         raise ValueError(f"Unsupported posture error checkpoint type {checkpoint.get('model_type')!r}.")
     model = SquatPostureErrorModel(
