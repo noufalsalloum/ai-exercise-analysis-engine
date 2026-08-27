@@ -34,6 +34,7 @@ from .pipeline import (
     UnsupportedExerciseError,
     VideoProcessingError,
     ensure_runnable,
+    probe_video_duration_seconds,
     run_analysis,
     supported_exercise_ids,
 )
@@ -149,6 +150,22 @@ async def analyze(
             return _error(400, "video_invalid", str(exc))
         except httpx.HTTPError as exc:
             return _error(400, "video_invalid", f"Could not download the video: {exc}")
+
+        # Cheap metadata-only check (no frame decode) before any real
+        # processing starts — rejects a video whose analysis would very
+        # likely exceed the platform's synchronous request-timeout window
+        # (see api.config.MAX_VIDEO_DURATION_SECONDS for how the cap was
+        # derived from real RunPod timing). None means OpenCV couldn't read
+        # duration metadata at all — let the real pipeline's own decoder
+        # raise a clear, honest error for that instead of guessing here.
+        duration_seconds = probe_video_duration_seconds(video_path)
+        if duration_seconds is not None and duration_seconds > config.MAX_VIDEO_DURATION_SECONDS:
+            return _error(
+                400,
+                "video_invalid",
+                f"Video is {duration_seconds:.1f}s long; the maximum for synchronous "
+                f"analysis is {config.MAX_VIDEO_DURATION_SECONDS:.0f}s.",
+            )
 
         try:
             outcome: dict[str, Any] = run_analysis(

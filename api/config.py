@@ -55,3 +55,30 @@ VIDEO_DOWNLOAD_TIMEOUT_SECONDS = 60.0
 # than silently show a low-confidence result as if it were normal. A starting
 # heuristic, not a validated threshold — tune once real sessions are observed.
 POSE_RARELY_DETECTED_THRESHOLD = 0.5
+
+# Rejects a video whose analysis would very likely run past the RunPod Load
+# Balancer's synchronous request-timeout window (documented default ~60s;
+# see RUNPOD.md) — checked cheaply (video metadata only, no frame decode)
+# before any real processing starts. Derived from measured, real RunPod
+# timing, not picked arbitrarily:
+#   - a 23s / 690-frame (30fps) clip's rule-based-only analysis (no
+#     experimental AI — see api/pipeline.py) completed in ~49-58s of real
+#     wall-clock time on a warm worker: a ~2.13x video-duration processing
+#     ratio (49.1s / 23s).
+#   - the same clip also once measured 75.2s under cold-start conditions —
+#     a real, observed ~26s of extra variance on top of the warm baseline,
+#     not hypothetical.
+#   - targeting total processing at or below 40s (leaving ~20s of margin
+#     under the ~60s window — enough to absorb the cold-start variance
+#     actually observed) gives a duration ceiling of 40 / 2.13 ~= 18.8s.
+# 18s is that, rounded down for a clean, deliberately conservative margin.
+# This is calibrated against 30fps source video specifically (both real
+# clips used for calibration were 30fps) — processing cost scales with
+# frame count, so a much-higher-fps video of the same nominal duration
+# would take longer than this ratio assumes; if that turns out to matter in
+# practice, the cheap probe already available in api/pipeline.py exposes
+# frame count too and this could be swapped to a frame-count cap instead.
+# The other, complementary lever for the cold-start variance specifically
+# (not covered by this cap at all) is RunPod's own min-workers setting —
+# see RUNPOD.md.
+MAX_VIDEO_DURATION_SECONDS = 18.0

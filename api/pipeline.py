@@ -19,6 +19,8 @@ import queue
 from pathlib import Path
 from typing import Any
 
+import cv2
+
 from application.exercise_registry import ExerciseRegistry
 from application.workers import AnalysisWorker
 from input_sources.frame_sources import VideoFrameSource
@@ -31,6 +33,29 @@ class UnsupportedExerciseError(Exception):
 
 class VideoProcessingError(Exception):
     """The video could not be decoded, or the pipeline raised mid-run."""
+
+
+def probe_video_duration_seconds(video_path: Path) -> float | None:
+    """Cheap, metadata-only duration read (container header, no frame
+    decode) — fast regardless of video length. Used to reject a video whose
+    analysis would very likely exceed the platform's request-timeout window
+    before spending any real processing time on it (see
+    api.config.MAX_VIDEO_DURATION_SECONDS for how the cap was derived).
+    Returns None if OpenCV can't read usable metadata — the real pipeline's
+    own VideoFrameSource raises a clear, honest error in that case instead
+    of this probe guessing."""
+
+    capture = cv2.VideoCapture(str(video_path))
+    try:
+        if not capture.isOpened():
+            return None
+        fps = capture.get(cv2.CAP_PROP_FPS)
+        frame_count = capture.get(cv2.CAP_PROP_FRAME_COUNT)
+        if fps <= 0 or frame_count <= 0:
+            return None
+        return frame_count / fps
+    finally:
+        capture.release()
 
 
 _registry = ExerciseRegistry()
@@ -54,6 +79,49 @@ class _CoverageTrackingPoseProcessor:
 
     def close(self) -> None:
         self._inner.close()
+
+
+def _squat_experimental_ai_skipped_status() -> dict[str, Any]:
+    """Honest 'not attempted' status for squat's experimental AI (boundary_v2
+    / correctness_v3 / error_v1) on the synchronous /analyze request.
+
+    These three models load fine now (see the weights_only=False fix at
+    their call sites in inference/squat_ai_mvp.py), but *running* them is
+    real, previously-never-executed inference work — on RunPod, a request
+    that includes it measured ~111s against a synchronous request-timeout
+    window of roughly 60s, for a clip whose rule-based-only analysis
+    reliably completes in ~50-58s. So the synchronous request never invokes
+    them at all (see run_analysis() below, squat_ai_factory=lambda: None) —
+    this keeps the proven, fast core path (rep count, phase, pose coverage)
+    completely unaffected by however slow or unavailable the experimental
+    models are. Shape matches the engine's own real "unavailable" contract
+    (application/workers.py's except-path for squat_ai.finalize_and_write)
+    field-for-field, so the client's existing parsing needs no changes —
+    this only fills in what the engine leaves as a bare `null` when no
+    squat_ai instance was ever constructed at all.
+    """
+
+    return {
+        "experimental": True,
+        "status": "Experimental",
+        "available": False,
+        "boundary_available": False,
+        "correctness_available": False,
+        "error_available": False,
+        "reason": (
+            "Experimental squat AI (boundary_v2/correctness_v3/error_v1) is "
+            "skipped by design on the synchronous /analyze request to keep "
+            "response time within the platform's request-timeout window — "
+            "see api/pipeline.py. This is not a load or inference failure."
+        ),
+        "ai_detected_reps": 0,
+        "ai_correct_reps": 0,
+        "ai_incorrect_reps": 0,
+        "ai_pass_rate": None,
+        "error_counts": {"bad_back": 0, "bad_heel": 0, "form_issue": 0},
+        "per_rep_results": [],
+        "score": None,
+    }
 
 
 def supported_exercise_ids() -> list[str]:
@@ -112,6 +180,18 @@ def run_analysis(
         # No live UI to pace playback for — process every frame as fast as
         # the pipeline can, exactly like ui/app.py's run_headless_video().
         preserve_video_timing=False,
+        # Squat's experimental AI (boundary_v2/correctness_v3/error_v1) is
+        # real, previously-hidden-by-checkpoint-load-failure inference work
+        # — measured at ~111s on RunPod for a clip whose rule-based-only
+        # path takes ~50-58s, well past the platform's synchronous
+        # request-timeout window. AnalysisWorker already treats a factory
+        # that returns None as "no experimental AI this session" (see
+        # application/workers.py) — passing one here means squat_ai is
+        # never constructed, so none of record_frame / request_live_analysis
+        # / finalize_and_write ever run. This does not touch the rule-based
+        # phase/rep counter at all — that is a fully separate code path
+        # (runtime.update_landmarks) unaffected by squat_ai's presence.
+        squat_ai_factory=(lambda: None) if exercise.family_id == "squat" else None,
     )
     worker.run_sync()
 
@@ -122,6 +202,16 @@ def run_analysis(
     if event["type"] == "error":
         raise VideoProcessingError(str(event.get("message")))
 
+    result = event["result"]
+    if exercise.family_id == "squat" and result.get("experimental_ai") is None:
+        # AnalysisWorker leaves experimental_ai as a bare None when no
+        # squat_ai instance was ever constructed (see the finalization
+        # elif-chain in application/workers.py — it has no branch for
+        # "squat, but squat_ai is None"). Fill in an honest status instead
+        # of relaying null, so the client can tell "skipped by design" apart
+        # from "the engine returned nothing about this at all".
+        result["experimental_ai"] = _squat_experimental_ai_skipped_status()
+
     processor = coverage_holder.get("processor")
     coverage_rate = (
         processor.detected / processor.processed
@@ -129,4 +219,4 @@ def run_analysis(
         else None
     )
 
-    return {"result": event["result"], "pose_coverage_rate": coverage_rate}
+    return {"result": result, "pose_coverage_rate": coverage_rate}
