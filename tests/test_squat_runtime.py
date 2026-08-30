@@ -26,6 +26,25 @@ class SquatRuntimeTests(unittest.TestCase):
     def test_router_uses_independent_squat_runtime(self) -> None:
         self.assertIsInstance(FamilyRuntimeRouter().create("squat", "video", "side"), SquatRepetitionRuntime)
 
+    def test_router_built_runtime_uses_the_fixed_minimum_pelvis_displacement(self) -> None:
+        # This is the actual production-effective value: FamilyRuntimeRouter
+        # loads configs/squat.json and overrides SquatRepConfig via
+        # from_dict() on every /analyze request - the dataclass default in
+        # inference/squat_runtime.py is NOT what a real request uses. Root
+        # cause of the 2026-08-30/31 investigation: the dataclass default
+        # was fixed (fa4ae39) while configs/squat.json silently kept the old
+        # 0.070, so nothing changed in production until this commit.
+        runtime = FamilyRuntimeRouter().create("squat", "video", "side")
+        self.assertEqual(runtime.config.minimum_pelvis_displacement, 0.060)
+
+    def test_dataclass_default_and_configs_json_stay_aligned(self) -> None:
+        # Guards against exactly this drifting apart again in either
+        # direction: configs/squat.json is the one that actually wins in
+        # production, but the two are meant to always agree.
+        router_effective = FamilyRuntimeRouter().create("squat", "video", "side").config.minimum_pelvis_displacement
+        dataclass_default = SquatRepConfig().minimum_pelvis_displacement
+        self.assertEqual(router_effective, dataclass_default)
+
     def test_complete_cycle_counts_once(self) -> None:
         results = feed(SquatRepetitionRuntime(config()), FULL_CYCLE)
         self.assertEqual(results[-1].repetition_count, 1)
