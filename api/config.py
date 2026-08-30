@@ -38,6 +38,17 @@ SQUAT_CHECKPOINT_PATHS = {
     "error_v1": PROJECT_ROOT / "checkpoints" / "squat_error_v1" / "best.pt",
 }
 
+# Deployment-integrity fingerprint (2026-08-31): written by Dockerfile.runpod
+# at build time from the build context's own .git/HEAD — proves what source
+# commit is actually baked into a given running image, independent of
+# whatever a deploy platform's UI *claims* was deployed. Never set locally
+# (no /app/GIT_SHA file outside a container), so this is "unknown" in dev by
+# design — that's expected, not an error.
+_GIT_SHA_FILE = PROJECT_ROOT / "GIT_SHA"
+GIT_SHA = (
+    _GIT_SHA_FILE.read_text().strip() if _GIT_SHA_FILE.is_file() else os.environ.get("GIT_SHA", "unknown")
+) or "unknown"
+
 # Mirrors expo/utils/exerciseAnalysis.ts's MAX_VIDEO_SIZE_MB — the client
 # already rejects an oversized file before upload, but the backend enforces
 # its own limit regardless of what the client checked, since video_url is

@@ -15,7 +15,11 @@
 # single container start, since application.workers unconditionally imports
 # inference.squat_ai_mvp regardless of which exercise family is requested —
 # confirmed by hiding each directory locally and importing api.main.
-.git/
+# .git/ intentionally NOT excluded: Dockerfile.runpod reads .git/HEAD at
+# build time to bake a GIT_SHA deployment-integrity fingerprint into the
+# image (see api/config.py's GIT_SHA / api/main.py's /health, /ping) —
+# excluding it would silently defeat the one thing that proves what source
+# actually built a given running image.
 .github/
 .vscode/
 __pycache__/

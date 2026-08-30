@@ -35,6 +35,7 @@ FROM python:3.11-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
+    git \
     libgl1 \
     libglib2.0-0 \
     libgomp1 \
@@ -52,6 +53,17 @@ RUN mkdir -p /app/mediapipe_models && \
     -o /app/mediapipe_models/pose_landmarker_full.task
 
 COPY . .
+
+# Deployment-integrity fingerprint: bake the exact source commit this image
+# was built from into a plain file, read at runtime by api/config.py and
+# exposed on /health and /ping as "git_sha". This is what actually proves
+# what code a running container has, independent of what any deploy
+# platform's release UI claims — added 2026-08-31 after a release showed a
+# commit label in RunPod's console that didn't match the running behavior.
+# `|| echo unknown` so a build without a real .git dir (context) degrades
+# safely instead of failing.
+RUN git rev-parse HEAD > /app/GIT_SHA 2>/dev/null || echo "unknown" > /app/GIT_SHA \
+    && rm -rf /app/.git
 
 RUN useradd --create-home --uid 1000 appuser && chown -R appuser:appuser /app
 USER appuser
