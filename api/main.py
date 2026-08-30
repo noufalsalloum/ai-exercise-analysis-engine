@@ -70,6 +70,7 @@ def _health_payload() -> tuple[int, dict[str, Any]]:
         "device": "cuda" if torch.cuda.is_available() else "cpu",
         "supported_exercise_families": supported_exercise_ids(),
         "git_sha": config.GIT_SHA,
+        "squat_runtime": config.squat_runtime_diagnostics(),
     }
     return (200 if ok else 503, body)
 

@@ -49,6 +49,39 @@ GIT_SHA = (
     _GIT_SHA_FILE.read_text().strip() if _GIT_SHA_FILE.is_file() else os.environ.get("GIT_SHA", "unknown")
 ) or "unknown"
 
+
+def squat_runtime_diagnostics() -> dict[str, object]:
+    """Reports the *actually effective* squat rep-counter values, not just a
+    source file's default. minimum_pelvis_displacement (and every other
+    SquatRepConfig field) is NOT read from inference/squat_runtime.py's
+    dataclass default at runtime — application/runtime_router.py's
+    FamilyRuntimeRouter.create() (the exact path api/pipeline.py's
+    AnalysisWorker uses for every /analyze video) loads configs/squat.json
+    fresh on every call and overrides every field via
+    SquatRepConfig.from_dict(...). A change to the dataclass default alone
+    is therefore invisible in production unless configs/squat.json agrees —
+    this function builds the real runtime the same way AnalysisWorker does,
+    specifically so /health and /ping can never report a value more
+    optimistic than what a real request actually uses. Import is local
+    (not at module load) since application.runtime_router transitively
+    pulls in the heavier inference stack; failures are caught so a
+    misconfigured diagnostic can never take down a liveness probe.
+    """
+    try:
+        import inspect
+
+        from application.runtime_router import FamilyRuntimeRouter
+        from inference import squat_runtime as squat_runtime_module
+
+        runtime = FamilyRuntimeRouter().create("squat", "video", "side")
+        return {
+            "minimum_pelvis_displacement": runtime.config.minimum_pelvis_displacement,
+            "return_pelvis_tolerance": runtime.config.return_pelvis_tolerance,
+            "squat_runtime_module_path": inspect.getfile(squat_runtime_module),
+        }
+    except Exception as exc:  # noqa: BLE001 - diagnostic only, must never crash /health
+        return {"error": f"{type(exc).__name__}: {exc}"}
+
 # Mirrors expo/utils/exerciseAnalysis.ts's MAX_VIDEO_SIZE_MB — the client
 # already rejects an oversized file before upload, but the backend enforces
 # its own limit regardless of what the client checked, since video_url is

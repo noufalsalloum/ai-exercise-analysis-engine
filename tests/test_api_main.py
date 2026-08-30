@@ -9,6 +9,7 @@ fails fast at import time without it (by design — see that module).
 
 from __future__ import annotations
 
+import json
 import os
 import unittest
 from pathlib import Path
@@ -19,6 +20,7 @@ os.environ.setdefault("API_SHARED_SECRET", "test-secret-for-unit-tests")
 from fastapi.testclient import TestClient  # noqa: E402
 
 import api.main as api_main  # noqa: E402
+from api.config import PROJECT_ROOT  # noqa: E402
 
 
 class AnalyzeDurationGuardTests(unittest.TestCase):
@@ -68,6 +70,46 @@ class AnalyzeDurationGuardTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         mock_run_analysis.assert_called_once()
+
+
+class PingSquatRuntimeDiagnosticTests(unittest.TestCase):
+    """Guards against the exact class of bug found 2026-08-31: a fix to
+    inference/squat_runtime.py's SquatRepConfig *dataclass default* silently
+    had zero effect in production, because
+    application/runtime_router.py's FamilyRuntimeRouter.create() - the code
+    path api/pipeline.py's AnalysisWorker actually uses for every /analyze
+    video - loads configs/squat.json fresh on every call and overrides every
+    field via SquatRepConfig.from_dict(...). /ping's squat_runtime block
+    must report the value a real request would actually use (i.e. what's in
+    configs/squat.json), not the dataclass default, or this exact failure
+    mode becomes invisible again."""
+
+    def setUp(self) -> None:
+        self.client = TestClient(api_main.app)
+
+    def test_ping_reports_the_real_configs_json_value_not_the_dataclass_default(self) -> None:
+        squat_config_path = PROJECT_ROOT / "configs" / "squat.json"
+        expected = json.loads(squat_config_path.read_text(encoding="utf-8"))["runtime"]["repetition_counter"]
+
+        response = self.client.get("/ping")
+
+        self.assertIn(response.status_code, (200, 503))
+        body = response.json()
+        squat_runtime = body["squat_runtime"]
+        self.assertNotIn("error", squat_runtime, squat_runtime.get("error"))
+        self.assertEqual(squat_runtime["minimum_pelvis_displacement"], expected["minimum_pelvis_displacement"])
+        self.assertEqual(squat_runtime["return_pelvis_tolerance"], expected["return_pelvis_tolerance"])
+        self.assertTrue(squat_runtime["squat_runtime_module_path"].replace("\\", "/").endswith(
+            "inference/squat_runtime.py"
+        ))
+
+    def test_health_and_ping_report_the_identical_squat_runtime_diagnostic(self) -> None:
+        # /health and /ping share _health_payload() - pin that down so they
+        # can never silently diverge.
+        self.assertEqual(
+            self.client.get("/health").json()["squat_runtime"],
+            self.client.get("/ping").json()["squat_runtime"],
+        )
 
 
 if __name__ == "__main__":
