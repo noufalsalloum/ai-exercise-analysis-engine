@@ -25,7 +25,22 @@ class SquatRepConfig:
     bottom_exit_angle: float = 122.0
     standing_return_angle: float = 155.0
     descent_start_displacement: float = 0.015
-    minimum_pelvis_displacement: float = 0.070
+    # Lowered from 0.070 (2026-08-30 root-cause investigation): a moderate-
+    # but-genuine squat depth (knee angle in the low 70s, well past
+    # bottom_enter_angle=110) was observed producing normalized pelvis-Y
+    # displacement of only ~0.0672-0.0687 on real video — short of the old
+    # 0.070 floor by ~2-4% despite the movement being a complete, honest
+    # squat cycle (confirmed by frame-by-frame visual inspection and
+    # comparison against a known-good reference clip at matched knee angle).
+    # 0.060 keeps a wide margin above both return_pelvis_tolerance (0.055,
+    # so the "gave up before reaching depth" cancellation path stays
+    # non-overlapping) and the deliberately-incomplete/ambiguous reference
+    # clip's observed ceiling (0.0338, ~1.8x below this floor), while
+    # comfortably admitting every real squat depth measured so far
+    # (0.0672-0.1537 across 6 clips). See tests/test_squat_runtime.py's
+    # "moderate depth" tests and the regression matrix in the AI-engine
+    # investigation notes for the full evidence.
+    minimum_pelvis_displacement: float = 0.060
     return_pelvis_tolerance: float = 0.055
     ascent_displacement_hysteresis: float = 0.015
     minimum_knee_rom: float = 45.0
